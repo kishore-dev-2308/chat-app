@@ -6,6 +6,13 @@ const register = async (req, res, next) => {
   const { username, email, password } = req.body;
 
   try {
+
+    const userExist = await User.findOne({ username });
+
+    if (userExist) {
+      return res.json({ success: false, message: "User name is already taken" });
+    }
+    
     const user = new User({
       username,
       email,

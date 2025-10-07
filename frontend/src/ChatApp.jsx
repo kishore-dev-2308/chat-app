@@ -115,6 +115,7 @@ const ChatApp = () => {
               onSelect={(group) => {
                 setSelectedChat({ type: "group", data: group });
                 setGroupData(group);
+                toggleSidebar();
               }}
               searchGroup={searchGroup}
               refresh={groupRefresh}
@@ -151,8 +152,10 @@ const ChatApp = () => {
               />
             </div>
             <PeopleList
-              onSelect={(person) =>
-                setSelectedChat({ type: "person", data: person })
+              onSelect={(person) =>{
+                setSelectedChat({ type: "person", data: person });
+                toggleSidebar();
+              }
               }
               searchFriend={searchFriend}
             />

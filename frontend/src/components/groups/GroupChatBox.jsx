@@ -532,7 +532,7 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
                         className="me-2"
                       />
                     )}
-                    <div style={{ maxWidth: "50%" }}>
+                    <div style={{ maxWidth: "80%" }}>
                       {!isOwn && msg.sender.username && (
                         <div className="text-muted small fw-semibold ms-1">
                           {msg?.sender?.username}

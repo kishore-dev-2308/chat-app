@@ -74,7 +74,7 @@ const GroupList = ({ onSelect, searchGroup, refresh }) => {
   if (filteredGroups.length === 0) {
     return (
       <div className="group-list d-flex justify-content-center align-items-center">
-        <span>No matching groups</span>
+        <span>No Groups Found</span>
       </div>
     );
   }

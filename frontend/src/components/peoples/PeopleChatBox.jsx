@@ -263,7 +263,7 @@ function PeopleChatBox({ receiverDetails, sidebarOpen, setSidebarOpen }) {
                       className="me-2"
                     />
                   )} */}
-                    <div style={{ maxWidth: "50%" }}>
+                    <div className="message-text-block" style={{ maxWidth: "80%" }}>
                       {msg.text && (
                         <div className="message-bubble position-relative bg-white p-2 rounded shadow-sm">
                           <span className="message-text text-dark d-block pe-5 me-3">

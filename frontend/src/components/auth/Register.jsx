@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -58,7 +59,21 @@ const Register = () => {
       const responseData = response.data;
 
       if (responseData.success) {
-        alert("Account created successfully. Please sign in.");
+        const result = await Swal.fire({
+          title: "Sign Up Successful!",
+          text: "Your account has been created successfully. Click below to sign in.",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonColor: "#83C212",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sign In",
+          cancelButtonText: "Stay Here",
+        });
+
+        if (result.isConfirmed) {
+          navigate("/sign-in");
+        }
+
         navigate("/sign-in");
       } else {
         setApiError(responseData.message || "Something went wrong.");
