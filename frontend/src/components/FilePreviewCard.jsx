@@ -1,5 +1,4 @@
 import {
-  faDownload,
   faFilePdf,
   faFileWord,
   faFileExcel,

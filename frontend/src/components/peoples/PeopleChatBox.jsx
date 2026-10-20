@@ -144,6 +144,7 @@ function PeopleChatBox({ receiverDetails, sidebarOpen, setSidebarOpen }) {
       socket.off(`private-message-${user._id}-${receiverId}`);
       socket.off("user-online-status");
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receiverId, user._id]);
 
   useEffect(() => {

@@ -50,7 +50,7 @@ const FindFriendsModal = ({ open, onClose }) => {
     } catch (error) {
       console.error("Error fetching friends", error);
     }
-  }, [token]);
+  }, [token, API_BASE_URL]);
 
   const searchUsers = useCallback(async () => {
     try {
@@ -76,7 +76,7 @@ const FindFriendsModal = ({ open, onClose }) => {
     } finally {
       setLoading(false);
     }
-  }, [search, token]);
+  }, [search, token, API_BASE_URL]);
 
   const handleAddFriend = async (id) => {
     try {

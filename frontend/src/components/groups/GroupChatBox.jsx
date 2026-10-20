@@ -40,7 +40,6 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const deleteProfileRef = useRef(null);
   const updateDetailsRef = useRef(null);
-  const [isEditing, setIsEditing] = useState(false);
   const updateProfileRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -208,6 +207,7 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
     return () => {
       socket.off(eventKey, handleIncomingMessage);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId, user?._id]);
 
   useEffect(() => {
@@ -391,7 +391,6 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
         navigate("/sign-in");
       }
     }
-    setIsEditing(false);
   };
 
   const handleProfileUpdate = async (file, groupId) => {

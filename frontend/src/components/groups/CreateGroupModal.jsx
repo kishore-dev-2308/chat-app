@@ -29,7 +29,6 @@ const CreateGroupModal = ({ open, onClose, onGroupCreated }) => {
   const [loading, setLoading] = useState(false);
   const [friends, setFriends] = useState([]);
 
-  const user = useSelector((state) => state.profile.user);
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -187,7 +186,7 @@ const CreateGroupModal = ({ open, onClose, onGroupCreated }) => {
           onClick={handleSubmit}
           variant="contained"
           color="primary"
-          disabled={loading || !groupName.trim() || selectedFriends.length == 0}
+          disabled={loading || !groupName.trim() || selectedFriends.length === 0}
         >
           Create Group
         </Button>

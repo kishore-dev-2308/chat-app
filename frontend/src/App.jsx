@@ -7,7 +7,7 @@ import Login from "./components/auth/Login";
 import PrivateRoute from "./routes/PrivateRoute.jsx";
 import Register from "./components/auth/Register.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import { setAuth } from "./slices/authSlice.jsx";
 import { setUser } from "./slices/profileSlice.jsx";
@@ -18,7 +18,6 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 function App() {
   const dispatch = useDispatch();
   const getSettingsRef = useRef(null);
-  const [loading, setLoading] = useState(true);
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const location = useLocation();

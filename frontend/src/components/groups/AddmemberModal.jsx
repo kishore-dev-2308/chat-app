@@ -33,7 +33,6 @@ function AddMemberModal({
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState([]);
   const [friendsList, setPeoples] = useState([]);
-  const [loading, setLoading] = useState(false);
   const getPeoplesRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -41,7 +40,6 @@ function AddMemberModal({
 
   const getPeoples = useCallback(async () => {
     try {
-      setLoading(true);
       getPeoplesRef.current = new AbortController();
 
       const config = {
@@ -69,10 +67,8 @@ function AddMemberModal({
         dispatch(setAuth({ login: false, token: null }));
         navigate("/sign-in");
       }
-    } finally {
-      setLoading(false);
     }
-  }, [dispatch, token, navigate]);
+  }, [dispatch, token, navigate, API_BASE_URL]);
 
   useEffect(() => {
     if (open) {
@@ -83,6 +79,7 @@ function AddMemberModal({
 
   useEffect(() => {
     getPeoples();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId]);
 
   const handleToggle = (id) => {
