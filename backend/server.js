@@ -1,10 +1,11 @@
+const path = require('path');
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 const http = require("http");
 const bcrypt = require("bcrypt");
 const PORT = process.env.PORT || 5000;
 const User = require("./models/User");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
 const { Server } = require("socket.io");
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -20,7 +21,6 @@ const Message = require("./models/Message.js");
 const messageRoutes = require("./routes/messages");
 const cookieParser = require("cookie-parser");
 const fs   = require('fs');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);

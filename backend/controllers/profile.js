@@ -31,7 +31,7 @@ const updateProfile = async (req, res) => {
 
     if (req.file) {
       console.log(req.file.path);
-      user.profileImage = req.file.path;
+      user.profileImage = req.file.path.replace(/\\/g, "/");
     }
 
     await user.save();
@@ -71,7 +71,7 @@ const updateProfileImage = async (req, res) => {
     }
 
     if (req.file) {
-      user.profileImage = req.file.path;
+      user.profileImage = req.file.path.replace(/\\/g, "/");
     } else {
       return res
         .status(400)

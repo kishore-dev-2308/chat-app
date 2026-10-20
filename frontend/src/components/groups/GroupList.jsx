@@ -7,12 +7,17 @@ import { setAuth } from "../../slices/authSlice";
 import moment from "moment";
 
 const formatDateTime = (isoString) => {
-  return moment(isoString).format("dddd, h:mma");
+  if (!isoString) return "";
+  const m = moment(isoString);
+  if (m.isSame(moment(), "day")) {
+    return m.format("h:mm A");
+  }
+  return m.format("MMM D");
 };
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const GroupList = ({ onSelect, searchGroup, refresh }) => {
+const GroupList = ({ onSelect, searchGroup, refresh, activeId }) => {
   const dispatch = useDispatch();
   const [groups, setGroups] = useState([]);
   const getGroupsRef = useRef(null);
@@ -60,21 +65,21 @@ const GroupList = ({ onSelect, searchGroup, refresh }) => {
   }, [getGroups, refresh]);
 
   const filteredGroups = groups.filter((group) =>
-    group.name.toLowerCase().includes(searchGroup?.toLowerCase() || "")
+    group.name?.toLowerCase().includes(searchGroup?.toLowerCase() || "")
   );
 
   if (loading) {
     return (
-      <div className="group-list d-flex justify-content-center align-items-center">
-        <span className="spinner-border text-success" />
+      <div className="d-flex justify-content-center align-items-center p-4">
+        <span className="spinner-border spinner-border-sm text-primary" />
       </div>
     );
   }
 
   if (filteredGroups.length === 0) {
     return (
-      <div className="group-list d-flex justify-content-center align-items-center">
-        <span>No Groups Found</span>
+      <div className="empty-state">
+        {searchGroup ? "No matching groups found" : "No groups joined yet"}
       </div>
     );
   }
@@ -87,51 +92,45 @@ const GroupList = ({ onSelect, searchGroup, refresh }) => {
             ?.split("/")
             ?.pop() || "";
 
-        const lastMessageText = group?.lastMessage || lastAttachmentFile;
+        const lastMessageText =
+          group?.lastMessage || (lastAttachmentFile ? "📎 Attachment" : "No messages yet");
 
         return (
           <div
             key={group._id}
             onClick={() => onSelect && onSelect(group)}
-            className="group-item d-flex align-items-center"
+            className={`group-item d-flex align-items-center ${
+              activeId === group._id ? "active" : ""
+            }`}
           >
-            <img
-              src={
-                group?.groupIcon
-                  ? `${API_BASE_URL}/${group.groupIcon}?v=${Date.now()}`
-                  : "/assets/icons/group-placeholder.png"
-              }
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/assets/icons/group-placeholder.png";
-              }}
-              alt={group.name}
-              className="group-avatar"
-            />
+            <div className="group-avatar-wrapper">
+              <img
+                src={
+                  group?.groupIcon
+                    ? `${API_BASE_URL}/${group.groupIcon}?v=${Date.now()}`
+                    : "/assets/icons/group-placeholder.png"
+                }
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/assets/icons/group-placeholder.png";
+                }}
+                alt={group.name}
+                className="group-avatar"
+              />
+            </div>
             <div className="group-info">
-              <div className="group-header d-flex justify-content-between">
-                <span
-                  className="group-name"
-                  style={{
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    maxWidth: "95px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+              <div className="group-header d-flex justify-content-between align-items-center">
+                <span className="group-name text-truncate">
                   {group.name}
                 </span>
                 {group.lastMessageTime && (
-                  <span className="group-time opacity-50 text-white fw-bold">
+                  <span className="group-time">
                     {formatDateTime(group.lastMessageTime)}
                   </span>
                 )}
               </div>
-              <div className="group-message d-flex justify-content-between">
-                <span
-                  className="text-truncate opacity-50 text-white fw-bold"
-                  title={lastMessageText}
-                >
+              <div className="group-message d-flex justify-content-between align-items-center">
+                <span className="text-truncate" title={lastMessageText}>
                   {lastMessageText}
                 </span>
                 {group.unreadCount > 0 && (

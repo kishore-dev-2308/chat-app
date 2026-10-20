@@ -63,8 +63,10 @@ const searchFriend = async (req, res) => {
       $and: [
         {
           $or: [
-            { name: { $regex: query, $options: "i" } },
+            { username: { $regex: query, $options: "i" } },
+            { profilename: { $regex: query, $options: "i" } },
             { email: { $regex: query, $options: "i" } },
+            { userCode: { $regex: query, $options: "i" } },
           ],
         },
         { _id: { $ne: req.user.userId } },

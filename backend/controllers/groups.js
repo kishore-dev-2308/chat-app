@@ -190,7 +190,7 @@ const updateProfileImage = async (req, res) => {
     }
 
     if (req.file) {
-      group.groupIcon = req.file.path;
+      group.groupIcon = req.file.path.replace(/\\/g, "/");
     } else {
       return res
         .status(400)
@@ -198,7 +198,7 @@ const updateProfileImage = async (req, res) => {
     }
     await group.save();
 
-    res.json({ group, success: true, message: "User removed successfully" });
+    res.json({ group, success: true, message: "Group icon updated successfully" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server error" });

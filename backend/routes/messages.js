@@ -104,12 +104,13 @@ router.post(
       }
 
       for (const file of attachments) {
+        const normalizedPath = file.path.replace(/\\/g, "/");
         const attachmentMessage = new Message({
           sender,
           text: "",
           receiver: receiver || null,
           groupId: groupId || null,
-          attachments: [file.path],
+          attachments: [normalizedPath],
         });
 
         await attachmentMessage.save();

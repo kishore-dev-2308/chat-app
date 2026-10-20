@@ -1,14 +1,11 @@
 import "../../styles/chat-app.scss";
 import { useEffect, useRef, useState } from "react";
-import { AppBar, Avatar, IconButton, TextField, Button } from "@mui/material";
+import { AppBar, Avatar, IconButton } from "@mui/material";
 import {
   Menu as MenuIcon,
   Send as SendIcon,
-  InsertEmoticon as InsertEmoticonIcon,
   AttachFile as AttachFileIcon,
   MoreVert as MoreVertIcon,
-  Phone as PhoneIcon,
-  Videocam as VideocamIcon,
   Download as DownloadIcon,
 } from "@mui/icons-material";
 import axios from "axios";
@@ -45,6 +42,24 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
   const updateDetailsRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
   const updateProfileRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (newMessage.trim() || attachments.length > 0) {
+        sendMessage();
+      }
+    }
+  };
+
+  const handleMessageChange = (e) => {
+    setNewMessage(e.target.value);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  };
 
   const handleDeleteGroup = async (groupId) => {
     try {
@@ -157,6 +172,9 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
         setMessages((prev) => [...prev, ...enrichedMessages]);
         setNewMessage("");
         setAttachments([]);
+        if (textareaRef.current) {
+          textareaRef.current.style.height = "auto";
+        }
       } else if (response.data.logout) {
         dispatch(setAuth({ login: false, token: null }));
         navigate("/sign-in");
@@ -467,40 +485,39 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
       <div className="chat-area d-flex flex-column flex-grow-1">
         <AppBar
           position="static"
-          className="bg-white shadow-sm d-flex flex-row justify-content-between align-items-center p-2 border-bottom"
+          className="chat-appbar d-flex flex-row justify-content-between align-items-center"
         >
           <div className="d-flex align-items-center">
-            <IconButton className="d-md-none" onClick={toggleSidebar}>
+            <IconButton className="d-md-none me-1" onClick={toggleSidebar} size="small">
               <MenuIcon />
             </IconButton>
             <Avatar
               src={
                 groupDetails?.groupIcon
-                  ? `${process.env.REACT_APP_API_BASE_URL}/${groupDetails.groupIcon}`
+                  ? `${process.env.REACT_APP_API_BASE_URL}/${groupDetails.groupIcon}?v=${Date.now()}`
                   : "/assets/icons/group-placeholder.png"
               }
-              sx={{ width: 50, height: 50 }}
-              className="me-2"
+              style={{ width: 44, height: 44, borderRadius: 12 }}
+              className="me-3"
             />
-            <div className="fw-semibold text-dark">
-              {groupDetails?.name || "Unknown"}
+            <div>
+              <div className="fw-bold text-dark" style={{ fontSize: "1rem", lineHeight: 1.2 }}>
+                {groupDetails?.name || "Unknown Group"}
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "#64748b", fontWeight: 500 }}>
+                {groupDetails?.members?.length ? `${groupDetails.members.length} members` : "Group"}
+              </div>
             </div>
           </div>
           <div>
-            {/* <IconButton>
-              <PhoneIcon />
-            </IconButton>
-            <IconButton>
-              <VideocamIcon />
-            </IconButton> */}
-            <IconButton onClick={toggleInfoPanel}>
+            <IconButton onClick={toggleInfoPanel} size="small">
               <MoreVertIcon />
             </IconButton>
           </div>
         </AppBar>
 
         {/* Chat Body */}
-        <div className="flex-grow-1 overflow-auto p-3 bg-light">
+        <div className="chat-messages-container flex-grow-1">
           {messages.map((msg) => {
             const currentDate = new Date(msg.timestamp).toDateString();
             const showDateSeparator = lastDate !== currentDate;
@@ -534,18 +551,20 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
                     )}
                     <div style={{ maxWidth: "80%" }}>
                       {!isOwn && msg.sender.username && (
-                        <div className="text-muted small fw-semibold ms-1">
+                        <div className="text-muted small fw-semibold ms-1 mb-1">
                           {msg?.sender?.username}
                         </div>
                       )}
                       {msg.text && (
-                        <div className="message-bubble position-relative bg-white p-2 rounded shadow-sm">
-                          <span className="message-text text-dark d-block pe-5 me-3">
-                            {msg.text}
-                          </span>
-                          <span className="message-time position-absolute bottom-0 end-0 text-muted small me-1 mb-1">
-                            {formatTime(msg.timestamp)}
-                          </span>
+                        <div className="message-bubble">
+                          <div className="message-content">
+                            <span className="message-text">
+                              {msg.text}
+                            </span>
+                            <span className="message-time">
+                              {formatTime(msg.timestamp)}
+                            </span>
+                          </div>
                         </div>
                       )}
                       {msg.attachments &&
@@ -613,10 +632,10 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
             e.preventDefault();
             sendMessage();
           }}
-          className="border-top p-3 d-flex flex-column"
+          className="chat-input-area"
         >
           {attachments.length > 0 && (
-            <div className="mb-2 d-flex flex-wrap gap-2">
+            <div className="attachments-preview-bar">
               {attachments.map((file, idx) => {
                 const fileURL = URL.createObjectURL(file);
                 const ext = file.name.split(".").pop().toLowerCase();
@@ -630,17 +649,26 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
                 ].includes(ext);
 
                 return (
-                  <div key={idx} className="position-relative">
+                  <div key={idx} className="position-relative" style={{ display: "inline-block" }}>
                     <IconButton
                       size="small"
-                      color="error"
                       onClick={() =>
                         setAttachments((prev) =>
                           prev.filter((_, i) => i !== idx)
                         )
                       }
-                      className="position-absolute top-0 end-0"
-                      style={{ zIndex: 2 }}
+                      style={{
+                        position: "absolute",
+                        top: -6,
+                        right: -6,
+                        zIndex: 2,
+                        backgroundColor: "#ef4444",
+                        color: "#fff",
+                        padding: 2,
+                        width: 18,
+                        height: 18,
+                        fontSize: 10,
+                      }}
                     >
                       ✕
                     </IconButton>
@@ -648,16 +676,19 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
                       <img
                         src={fileURL}
                         alt="preview"
-                        className="border rounded"
-                        style={{ width: 100, height: 100, objectFit: "cover" }}
+                        className="rounded"
+                        style={{ width: 64, height: 64, objectFit: "cover", border: "1px solid #cbd5e1" }}
                       />
                     ) : (
                       <div
-                        className="border rounded bg-white p-2 text-center"
+                        className="rounded bg-white p-2 text-center"
                         style={{
-                          width: 150,
+                          width: 120,
+                          fontSize: "0.75rem",
                           textOverflow: "ellipsis",
                           overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          border: "1px solid #cbd5e1",
                         }}
                       >
                         📄 {file.name}
@@ -669,7 +700,7 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
             </div>
           )}
 
-          <div className="d-flex align-items-center">
+          <div className="input-form-wrapper">
             <input
               type="file"
               id="fileInput"
@@ -682,33 +713,30 @@ function GroupChatBox({ groupDetails, setSidebarOpen, sidebarOpen }) {
               }}
             />
             <IconButton
+              size="small"
               onClick={() => document.getElementById("fileInput").click()}
+              style={{ color: "#64748b" }}
             >
               <AttachFileIcon />
             </IconButton>
 
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Type your message..."
-              className="flex-grow-1 mx-2"
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              className="text-input-field"
+              placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={handleMessageChange}
+              onKeyDown={handleKeyDown}
             />
 
-            <IconButton>
-              <InsertEmoticonIcon />
-            </IconButton>
-
-            <Button
+            <button
               type="submit"
-              variant="contained"
-              color="primary"
-              className="ms-2"
+              className="btn-send"
               disabled={!newMessage.trim() && attachments.length === 0}
             >
-              <SendIcon />
-            </Button>
+              <SendIcon style={{ fontSize: "18px" }} />
+            </button>
           </div>
         </form>
       </div>
